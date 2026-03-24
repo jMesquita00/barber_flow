@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 fw-bold" style="color: #2c3e50;">
+                <i class="fas fa-wallet text-success me-2"></i>Financeiro
+            </h2>
+            <p class="text-muted small mb-0">Gestão de receitas da barbearia</p>
+        </div>
+        <a href="{{ url_for('main.admin_panel') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 shadow-sm">
+            <i class="fas fa-arrow-left me-1"></i> Painel Admin
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow border-0 bg-dark text-white" style="border-radius: 15px;">
+                <div class="card-body p-4 text-center">
+                    <h6 class="text-uppercase opacity-75 mb-2 small fw-bold">Faturamento Bruto</h6>
+                    <h1 class="display-5 fw-bold mb-0" style="color: #f1c40f;">R$ {{ "%.2f"|format(total) }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card shadow border-0 text-center" style="border-radius: 15px; border-left: 5px solid #2ecc71 !important;">
+                <div class="card-body p-4">
+                    <h6 class="text-uppercase text-muted mb-2 small fw-bold">Atendimentos Concluídos</h6>
+                    <h1 class="display-5 fw-bold text-success mb-0">{{ atendimentos|length }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow border-0 h-100 p-4" style="border-radius: 15px;">
+                <h5 class="fw-bold mb-4" style="color: #2c3e50;">Receita por Serviço</h5>
+                <div class="chart-container" style="position: relative; height:300px;">
+                    <canvas id="meuGrafico" data-valores='{{ dados_grafico | tojson }}'></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow border-0 h-100" style="border-radius: 15px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0" style="color: #2c3e50;">Entradas Recentes</h5>
+                </div>
+                <div class="card-body px-4">
+                    <div class="list-group list-group-flush">
+                        {% for item in atendimentos[:5]|reverse %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0 border-bottom">
+                            <div>
+                                <span class="d-block fw-bold text-dark">{{ item.servico }}</span>
+                                <small class="text-muted">{{ item.data_hora.strftime('%d/%m - %H:%M') }}</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">
+                                R$ {{ "%.2f"|format(item.valor) }}
+                            </span>
+                        </div>
+                        {% else %}
+                        <p class="text-muted text-center py-4">Nenhum dado.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvas = document.getElementById('meuGrafico');
+        if (!canvas) return;
+
+        const dadosReais = JSON.parse(canvas.getAttribute('data-valores') || "[0, 0, 0]");
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Corte', 'Barba', 'Combo'],
+                datasets: [{
+                    label: 'Total (R$)',
+                    data: dadosReais, 
+                    backgroundColor: [
+                        '#3498db', // Azul Vivo
+                        '#e67e22', // Laranja Vivo
+                        '#9b59b6'  // Roxo Vivo
+                    ],
+                    borderRadius: 10,
+                    barThickness: 50
+                }]
+            },
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f0f0f0' },
+                        ticks: { 
+                            callback: function(value) { return 'R$ ' + value; }
+                        }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

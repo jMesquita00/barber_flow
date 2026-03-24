@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3>Agendar em: {{ salao.nome }}</h3>
+                <a href="{{ url_for('main.selecionar_salao') }}" class="btn btn-outline-secondary btn-sm">Trocar Salão</a>
+            </div>
+            <p class="text-muted small">{{ salao.endereco }}</p>
+            <hr>
+
+            <form action="{{ url_for('main.agendar', salao_id=salao.id) }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Escolha o Serviço</label>
+                    <select name="servico" class="form-select" required>
+                        <option value="" disabled selected>Selecione um serviço...</option>
+                        <option value="Corte Degradê">Corte Degradê - R$ 45,00</option>
+                        <option value="Barba Completa">Barba Completa - R$ 30,00</option>
+                        <option value="Combo (Cabelo + Barba)">Combo - R$ 65,00</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Data e Hora desejada</label>
+                    <input type="datetime-local" name="data_hora" class="form-control" required>
+                </div>
+
+                <div class="alert alert-warning small">
+                    <i class="bi bi-info-circle"></i> O agendamento está sujeito à disponibilidade do profissional neste salão.
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 btn-lg shadow-sm">
+                    Confirmar Horário
+                </button>
+                <a href="{{ url_for('main.index') }}" class="btn btn-link w-100 mt-2 text-muted">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

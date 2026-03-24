@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 animate__animated animate__fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-cut me-2"></i>Painel de Gerenciamento</h2>
+        <span class="badge bg-dark p-2">{{ agendamentos|length }} Agendamentos</span>
+    </div>
+    <div class="container mt-5 mb-3">
+        <a href="{{ url_for('main.financeiro') }}" class="btn btn-success">
+        <i class="fas fa-dollar-sign"></i> Ver Financeiro
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Cliente</th>
+                            <th>Serviço</th>
+                            <th>Data/Hora</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agendamento in agendamentos %}
+                        <tr>
+                            <td class="ps-4">
+                                <strong>{{ agendamento.cliente.nome }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-info text-dark">
+                                    {{ agendamento.servico }}
+                                </span>
+                            </td>
+                            <td>{{ agendamento.data_hora.strftime('%d/%m %H:%M') }}</td>
+                            <td class="text-center">
+                            <td class="text-center">
+                                <form action="{{ url_for('main.concluir_agendamento', id=agendamento.id) }}"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-success btn-sm me-1 shadow-sm">
+                                        <i class="fas fa-check-circle me-1"></i> Concluir
+                                    </button>
+                                </form>
+
+                                <form action="{{ url_for('main.cancelar_agendamento', id=agendamento.id) }}"
+                                    method="POST" style="display:inline;"
+                                    onsubmit="return confirm('Deseja mesmo cancelar este horário?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm">
+                                        <i class="fas fa-times-circle me-1"></i> Cancelar
+                                    </button>
+                                </form>
+                            </td>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fas fa-calendar-day fa-3x mb-3 d-block"></i>
+                                Nenhum agendamento para hoje.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
